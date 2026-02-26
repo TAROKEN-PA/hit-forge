@@ -8,46 +8,55 @@ st.set_page_config(page_title=APP_TITLE, layout="wide", initial_sidebar_state="e
 #  HitForge Master DNA Data
 # =========================
 DNA_MASTER = {
-    "J-POP (Mainstream)": {"bpm": 148, "key": "1 (C#/Db)", "energy": 0.78,
+    "J-POP (Mainstream)": {"bpm": 148, "key": 1, "key_name": "1 (C#/Db)", "energy": 0.78,
                            "logic": "現代の王道ヒット。BPM140超の疾走感。"},
-    "J-POP (Ballad)": {"bpm": 72, "key": "0 (C)", "energy": 0.45, "logic": "ピアノ主体の構成。"},
-    "J-Rock": {"bpm": 165, "key": "2 (D)", "energy": 0.85, "logic": "Overdriven guitarsと激しいドラム。"},
-    "Anime Song": {"bpm": 175, "key": "1 (C#/Db)", "energy": 0.90, "logic": "高揚感と転調の多用。"},
-    "Vocaloid Style": {"bpm": 190, "key": "6 (F#/Gb)", "energy": 0.92, "logic": "超高速/複雑。"},
-    "City Pop": {"bpm": 115, "key": "9 (A)", "energy": 0.65, "logic": "80s DX7 synths / Fretless bass."},
-    "K-Pop (Dance)": {"bpm": 124, "key": "1 (C#/Db)", "energy": 0.82, "logic": "低音重視ダンスフロア。"},
-    "K-Pop (HipHop)": {"bpm": 95, "key": "10 (A#/Bb)", "energy": 0.75, "logic": "重厚Trapビート。"},
-    "Global Viral": {"bpm": 105, "key": "7 (G)", "energy": 0.72, "logic": "王道Viral。"},
-    "Lo-fi Hip Hop": {"bpm": 85, "key": "5 (F)", "energy": 0.35, "logic": "Vinyl crackle / Rhodes."},
-    "Future Bass": {"bpm": 160, "key": "1 (C#/Db)", "energy": 0.85, "logic": "キラキラしたシンセ音。"},
-    "Trap": {"bpm": 140, "key": "8 (G#/Ab)", "energy": 0.75, "logic": "808ベースの唸り。"},
+    "J-POP (Ballad)": {"bpm": 72, "key": 0, "key_name": "0 (C)", "energy": 0.45, "logic": "ピアノ主体の構成。"},
+    "J-Rock": {"bpm": 165, "key": 2, "key_name": "2 (D)", "energy": 0.85,
+               "logic": "Overdriven guitars/Energetic drums."},
+    "Anime Song": {"bpm": 175, "key": 1, "key_name": "1 (C#/Db)", "energy": 0.90, "logic": "高揚感と転調の多用。"},
+    "Vocaloid Style": {"bpm": 190, "key": 6, "key_name": "6 (F#/Gb)", "energy": 0.92, "logic": "超高速/複雑。"},
+    "City Pop": {"bpm": 115, "key": 9, "key_name": "9 (A)", "energy": 0.65, "logic": "80s DX7 synths/Fretless bass."},
+    "K-Pop (Dance)": {"bpm": 124, "key": 1, "key_name": "1 (C#/Db)", "energy": 0.82, "logic": "低音重視ダンスフロア。"},
+    "K-Pop (HipHop)": {"bpm": 95, "key": 10, "key_name": "10 (A#/Bb)", "energy": 0.75, "logic": "重厚Trapビート。"},
+    "Global Viral)": {"bpm": 105, "key": 7, "key_name": "7 (G)", "energy": 0.72, "logic": "王道Viral。"},
+    "Lo-fi Hip Hop": {"bpm": 85, "key": 5, "key_name": "5 (F)", "energy": 0.35, "logic": "Vinyl crackle/Rhodes."},
+    "Future Bass": {"bpm": 160, "key": 1, "key_name": "1 (C#/Db)", "energy": 0.85, "logic": "キラキラしたシンセ音。"},
+    "Trap": {"bpm": 140, "key": 8, "key_name": "8 (G#/Ab)", "energy": 0.75, "logic": "808ベースの唸り。"},
 }
 
 KEY_LIST = ["0 (C)", "1 (C#/Db)", "2 (D)", "3 (D#/Eb)", "4 (E)", "5 (F)",
             "6 (F#/Gb)", "7 (G)", "8 (G#/Ab)", "9 (A)", "10 (A#/Bb)", "11 (B)"]
 
 # =========================
-#  Lux UI Style (配色・視認性修正)
+#  Lux UI: Browser Neutral Fix (強制色指定)
 # =========================
 st.markdown(
     """
     <style>
-      :root {
-        --bg: #0a0b0e; --panel: #101217; --card: #111418; --border: #1d212a;
-        --text: #ffffff; --gold: #e3b341;
+      /* 全体背景と基本文字色を強制 */
+      [data-testid="stAppViewContainer"], [data-testid="stHeader"], .main {
+        background-color: #0a0b0e !important;
+        color: #ffffff !important;
       }
-      html, body, [data-testid="stAppViewContainer"] { background: var(--bg); color: var(--text); }
-      .app-title h1 { font-size: 2.6rem; font-weight: 900; color: var(--text); margin: 0; }
-      .gold-underline { display:inline-block; height:6px; width:160px; border-radius:6px; background: linear-gradient(90deg, var(--gold), #f1c84c); margin-bottom: 20px; }
-      .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem; }
-
-      /* 入力BOXの視認性改善：背景を少し明るく、文字を白に固定 */
-      input, select, textarea { background-color: #1d212a !important; color: white !important; border: 1px solid #333 !important; }
-      div[data-baseweb="select"] > div { background-color: #1d212a !important; color: white !important; }
-      label, p, span, .stMarkdown { color: #ffffff !important; }
-
-      .stButton > button { background: linear-gradient(135deg, #1b1e25 0%, rgba(227,179,65,1) 100%); color:#000 !important; font-weight: 900; border-radius: 12px; width:100%; border:none; height: 3.2rem; }
-      .gold-chip { display:inline-flex; background: rgba(227,179,65,0.15); border:1px solid var(--gold); padding:2px 10px; border-radius: 20px; color: var(--gold); font-size:0.8rem; margin-right:5px; margin-top:5px;}
+      [data-testid="stSidebar"] {
+        background-color: #101217 !important;
+        border-right: 1px solid #1d212a !important;
+      }
+      /* 入力フォームの背景と文字色を強制(ブラウザ依存対策) */
+      input, select, textarea, div[data-baseweb="select"], .stNumberInput div {
+        background-color: #1d212a !important;
+        color: #ffffff !important;
+        border-color: #333 !important;
+      }
+      /* 全ラベルの文字色を白に強制 */
+      label, p, span, h1, h2, h3, small {
+        color: #ffffff !important;
+      }
+      .app-title h1 { font-size: 2.6rem; font-weight: 900; margin: 0; }
+      .gold-underline { display:inline-block; height:6px; width:160px; border-radius:6px; background: linear-gradient(90deg, #e3b341, #f1c84c); margin-bottom: 20px; }
+      .card { background-color: #111418 !important; border: 1px solid #1d212a !important; border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem; }
+      .stButton > button { background: linear-gradient(135deg, #1b1e25 0%, #e3b341 100%) !important; color:#000000 !important; font-weight: 900; border-radius: 12px; border:none; width:100%; height: 3.2rem; }
+      .gold-chip { display:inline-flex; background: rgba(227,179,65,0.15); border:1px solid #e3b341; padding:2px 10px; border-radius: 20px; color: #e3b341 !important; font-size:0.8rem; margin-right:5px; }
     </style>
     """, unsafe_allow_html=True
 )
@@ -56,19 +65,18 @@ st.markdown('<div class="app-title"><h1>🎼 HitForge</h1><span class="gold-unde
             unsafe_allow_html=True)
 
 # =========================
-#  Sidebar (Input Logic)
+#  Sidebar (Controls)
 # =========================
 with st.sidebar:
     st.header("👤 IDENTITY")
     v_gender = st.radio("アーティスト性別", ["Male", "Female", "Non-binary"], index=1)
     l_pov = st.radio("歌詞の視点", ["Male POV", "Female POV", "Neutral POV"], index=2)
 
-    st.header("📝 PRODUCTION CONTROL")
-    must_have = st.text_input("歌詞必須キーワード", placeholder="例: 青い閃光, 運命のドア")
-    negative_p = st.text_input("ネガティブプロンプト(避ける語)", placeholder="例: 卒業, 桜")
+    st.header("📝 PRODUCTION")
+    must_have = st.text_input("歌詞必須キーワード", placeholder="例: 青い閃光")
+    negative_p = st.text_input("NGワード", placeholder="例: 卒業, 桜")
 
-    # プロンプト文字数制限 (スライダーと数値入力を同期)
-    st.write("プロンプト文字数制限 (Length Limit)")
+    st.write("プロンプト文字数制限")
     c1, c2 = st.columns([2, 1])
     with c1:
         limit_sl = st.slider("Slider", 80, 2500, 1500, 10, label_visibility="collapsed")
@@ -76,17 +84,26 @@ with st.sidebar:
         limit = st.number_input("Value", 80, 2500, value=limit_sl, label_visibility="collapsed")
 
     st.header("🎛️ DNA PRESET")
-    genre_key = st.selectbox("GENRE (Preset Selection)", list(DNA_MASTER.keys()))
+    genre_key = st.selectbox("GENRE (Preset)", list(DNA_MASTER.keys()))
     dna = DNA_MASTER[genre_key]
 
-    # 手動上書きトグル
-    manual_on = st.toggle("🔧 Manual Overide (BPM/Key調整)")
+    # --- グラフ表示ボタンを追加 ---
+    if st.button("📊 Show DNA Stats (グラフ確認)"):
+        st.write(f"**Current DNA: {genre_key}**")
+        # BPM グラフ (簡易表示)
+        st.caption(f"BPM Position: {dna['bpm']}")
+        st.progress((dna['bpm'] - 40) / 260)  # 40-300の範囲で可視化
+        # Key Position (0-11)
+        st.caption(f"Key Position: {dna['key_name']}")
+        st.bar_chart([0 if i != dna['key'] else dna['energy'] for i in range(12)])
+
+    manual_on = st.toggle("🔧 Manual Overide (手動調整)")
     if manual_on:
         t_bpm = st.number_input("BPM", 40, 300, value=dna["bpm"])
-        t_key = st.selectbox("KEY", KEY_LIST, index=KEY_LIST.index(dna["key"]))
+        t_key = st.selectbox("KEY", KEY_LIST, index=KEY_LIST.index(dna["key_name"]))
     else:
         t_bpm = dna["bpm"]
-        t_key = dna["key"]
+        t_key = dna["key_name"]
 
     lang_opt = st.selectbox("言語構成",
                             ["日本語（サビは英語も混ぜる）", "全日本語", "韓国語（サビは英語も混ぜる）", "全英語"])
@@ -94,74 +111,50 @@ with st.sidebar:
     optimizer = st.toggle("Top-Chart Optimizer", value=True)
 
 # =========================
-#  Original Prompt Logic (完全復元版)
+#  Logic & Generation
 # =========================
 if st.button("⚡ Generate Hit-DNA Production Prompt"):
-
-    # --- 作曲(Style)プロンプトの構築 ---
-    # 元のファイルにあった各ジャンルの楽器・構成ロジックを正確に反映
-    inst_detail = "Modern J-POP production with rich instrument layers."
+    # 楽器ロジック復元
+    inst_detail = "Modern J-POP production."
     if "Ballad" in genre_key:
-        inst_detail = "Emotional Grand Piano, soaring strings, delicate live percussion."
+        inst_detail = "Grand Piano, emotional strings, delicate live percussion."
     elif "Rock" in genre_key:
-        inst_detail = "Driving overdriven electric guitars, energetic bassline, real acoustic drums."
+        inst_detail = "Overdriven guitars, energetic bass, real acoustic drums."
     elif "City Pop" in genre_key:
-        inst_detail = "Fretless bass, funky Rhodes piano, vintage 80s DX7 synth pads, clean electric guitar."
+        inst_detail = "Fretless bass, funky Rhodes, vintage 80s DX7 synth pads."
     elif "Lo-fi" in genre_key:
-        inst_detail = "Chill Rhodes, dusty vinyl crackle, boom-bap drums, sampled aesthetic."
+        inst_detail = "Chill Rhodes, dusty vinyl crackle, boom-bap drums."
     elif "Vocaloid" in genre_key:
-        inst_detail = "Aggressive digital synths, lightning-fast piano arpeggios, heavy glitch effects."
+        inst_detail = "Aggressive digital synths, fast piano arpeggios, glitch effects."
 
-    # オプティマイザー（サビのタイミング等）
-    opt_logic = ""
-    if optimizer:
-        opt_logic = "Hit-Logic: Intro <15s, 1st Chorus starts <45s. High loudness, high energy peak at chorus."
-
+    # 作曲プロンプト (空白詰め)
+    opt_logic = f"Hit-Logic:Intro<15s,1st Chorus<45s.High loudness,peak energy at chorus." if optimizer else ""
     style_raw = (
-        f"Genre: {genre_key}. BPM: {t_bpm}. Key: {t_key}. Energy Level: {dna['energy']}. "
-        f"Instruments: {inst_detail}. Vocal: {v_gender}. "
-        f"{'Effect: Anthemic soaring chorus boost.' if boost_mode else ''} {opt_logic} "
-        f"Avoid: {negative_p if negative_p else 'none'}."
-    )
+        f"Genre:{genre_key}.BPM:{t_bpm}.Key:{t_key}.Energy:{dna['energy']}.Inst:{inst_detail}Vocal:{v_gender}.{'Anthemic soaring chorus boost.' if boost_mode else ''}{opt_logic}Avoid:{negative_p if negative_p else 'none'}.").replace(
+        "  ", " ").strip()
 
-    # --- 作詞(Lyrics)プロンプトの構築 ---
+    # 作詞プロンプト (空白詰め)
     lyrics_raw = (
-        f"Write professional lyrics for a {genre_key} song. Language: {lang_opt}. "
-        f"Vocal POV: {l_pov}. Key Theme: {must_have}. "
-        f"Negative Constraint: Strictly NOT use these words: {negative_p if negative_p else 'none'}. "
-        f"Song Structure: [Intro] -> [Verse 1] -> [Pre-Chorus] -> [Chorus] -> [Verse 2] -> [Chorus] -> [Bridge] -> [Chorus] -> [Outro]. "
-        f"Guidelines: Emotional imagery, catchy rhymes, rhythmic alignment with {t_bpm} BPM."
-    )
+        f"Professional lyrics for {genre_key}.Language:{lang_opt}.POV:{l_pov}.Theme:{must_have}.Exclude:{negative_p if negative_p else 'none'}.Structure:[Intro][Verse1][Pre-Chorus][Chorus][Verse2][Chorus][Bridge][Chorus][Outro].Guidelines:Emotional imagery,rhythmic alignment with {t_bpm}BPM.").replace(
+        "  ", " ").strip()
 
-    # 指定された「プロンプト自体の文字数制限」を適用
+    # 文字数制限
     style_final = style_raw[:limit]
     lyrics_final = lyrics_raw[:limit]
 
-    # --- 結果表示 ---
-    st.markdown("### 🧪 生成結果 (Production Ready)")
+    # 表示
+    st.markdown("### 🧪 生成結果 (DNA-Synced)")
     st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.subheader("🎨 Style / Composition Prompt")
+    st.text_area("作曲指示", value=style_final, height=150, key="st_ta")
+    st.subheader("✍️ Lyrics Prompt")
+    st.text_area("作詞指示", value=lyrics_final, height=220, key="ly_ta")
 
-    st.subheader("🎨 Style / Composition Prompt (作曲指示)")
-    st.text_area("Copy this for Music AI Tools", value=style_final, height=160, key="style_ta")
+    all_output = f"【STYLE】\n{style_final}\n\n【LYRICS】\n{lyrics_final}"
+    st.download_button("⬇️ プロンプトを保存", data=all_output, file_name="hitforge_production.txt")
 
-    st.subheader("✍️ Lyrics Prompt (作詞指示)")
-    st.text_area("Copy this for Lyrics/LLM Tools", value=lyrics_final, height=220, key="lyrics_ta")
-
-    # ダウンロードボタン
-    all_output = f"【STYLE PROMPT】\n{style_final}\n\n【LYRICS PROMPT】\n{lyrics_final}"
-    st.download_button("⬇️ プロンプトを保存", data=all_output, file_name="hitforge_production_prompt.txt")
-
-    # DNAロジックの可視化
-    st.subheader("🧠 Hit-DNA Logic Analysis")
-    st.markdown(f"""
-        <div style="margin-top:10px;">
-            <span class="gold-chip">BPM: {t_bpm}</span>
-            <span class="gold-chip">KEY: {t_key}</span>
-            <span class="gold-chip">ENERGY: {dna['energy']}</span>
-            <br/><br/>
-            <p style='color:#e3b341'>Preset Logic: {dna['logic']}</p>
-            <p style='color:#ffffffcc'>Arrangement: {inst_detail}</p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.subheader("🧠 DNA Analysis")
+    st.markdown(
+        f"""<div style="margin-top:10px;"><span class="gold-chip">BPM: {t_bpm}</span><span class="gold-chip">KEY: {t_key}</span><span class="gold-chip">ENERGY: {dna['energy']}</span><p style='color:#e3b341; margin-top:10px;'>Logic: {dna['logic']}</p></div>""",
+        unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
-    st.success("⚔️ 黄金比データの注入が完了しました！")
