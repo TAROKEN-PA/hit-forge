@@ -7,7 +7,7 @@ APP_TITLE = "HitForge"
 st.set_page_config(page_title=APP_TITLE, layout="wide", initial_sidebar_state="expanded")
 
 # =========================================================
-#  Master Data (Lyric Flavorの日本語化)
+#  Master Data
 # =========================================================
 DNA_MASTER = {
     "J-POP (Mainstream)": {"bpm": 148, "key": 1, "key_name": "C#", "energy": 0.78,
@@ -41,7 +41,6 @@ DNA_MASTER = {
 
 KEY_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]
 
-# フレーバーを日本語に
 LYRIC_FLAVORS = {
     "王道チャート": "Standard catchy phrasing.",
     "詩的・比喩的": "Highly metaphorical, abstract, and poetic imagery.",
@@ -65,8 +64,6 @@ st.markdown(
       .card { background-color: #111418 !important; border: 1px solid #1d212a !important; border-radius: 14px; padding: 1.2rem; margin-bottom: 1.5rem; }
       .stButton > button { background: linear-gradient(135deg, #1b1e25 0%, #e3b341 100%) !important; color:#000 !important; font-weight: 900; border-radius: 12px; height: 3.2rem; border:none; width:100%; }
       .gold-chip { display:inline-flex; background: rgba(227,179,65,0.15); border:1px solid #e3b341; padding:2px 10px; border-radius: 20px; color: #e3b341 !important; font-size:0.75rem; margin-right:5px; }
-      /* ラジオボタンをスマホで押しやすく */
-      div[data-testid="stMarkdownContainer"] > p { font-size: 0.9rem !important; }
     </style>
     """, unsafe_allow_html=True
 )
@@ -75,7 +72,7 @@ st.markdown('<div class="app-title"><h1>🎼 HitForge</h1><span class="gold-unde
             unsafe_allow_html=True)
 
 # =========================================================
-#  Sidebar (モバイル最適化)
+#  Sidebar (双方向連動ロジック修正)
 # =========================================================
 with st.sidebar:
     st.header("👤 IDENTITY")
@@ -86,13 +83,26 @@ with st.sidebar:
     must_have = st.text_input("必須キーワード", placeholder="例: 青い閃光")
     negative_p = st.text_input("NGワード", placeholder="例: 桜")
 
-    # --- 数値同期ロジック ---
+    # --- エラー回避用の双方向連動ロジック ---
     st.write("プロンプト文字数制限")
     if "p_limit" not in st.session_state:
         st.session_state.p_limit = 1500
 
-    limit_val = st.number_input("数値入力", 80, 2500, key="p_limit", label_visibility="collapsed")
-    limit_sld = st.slider("スライダー調整", 80, 2500, key="p_limit", label_visibility="collapsed")
+
+    # 1. 数値入力が変更されたときの処理
+    def on_num_change():
+        st.session_state.p_limit = st.session_state.num_val
+
+
+    # 2. スライダーが変更されたときの処理
+    def on_sld_change():
+        st.session_state.p_limit = st.session_state.sld_val
+
+
+    limit_val = st.number_input("数値入力", 80, 2500, value=st.session_state.p_limit, key="num_val",
+                                on_change=on_num_change, label_visibility="collapsed")
+    limit_sld = st.slider("スライダー調整", 80, 2500, value=st.session_state.p_limit, key="sld_val",
+                          on_change=on_sld_change, label_visibility="collapsed")
 
     st.header("🎛️ DNA PRESET")
     genre_key = st.selectbox("GENRE (Preset)", list(DNA_MASTER.keys()))
@@ -128,9 +138,10 @@ if st.button("⚡ プロンプトを生成する"):
         f"Lyrics:{genre_key}.Lang:{lang_opt}.POV:{l_pov}.Flavor:{LYRIC_FLAVORS[flavor]}.Theme:{must_have}.Exclude:{negative_p if negative_p else 'none'}.Struct:{compact_struct}.Guide:Sensory details,emotional arc,rhythmic flow with {t_bpm}BPM.Avoid clichés.").replace(
         "  ", " ").strip()
 
-    # 最終的な制限
-    style_final = style_raw[:st.session_state.p_limit]
-    lyrics_final = lyrics_raw[:st.session_state.p_limit]
+    # セッション状態の値を参照して制限
+    current_limit = st.session_state.p_limit
+    style_final = style_raw[:current_limit]
+    lyrics_final = lyrics_raw[:current_limit]
 
     st.markdown("### 🧪 生成結果 (DNA-Synced)")
     st.markdown('<div class="card">', unsafe_allow_html=True)
