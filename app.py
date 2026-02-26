@@ -6,9 +6,7 @@ import numpy as np
 APP_TITLE = "HitForge"
 st.set_page_config(page_title=APP_TITLE, layout="wide", initial_sidebar_state="expanded")
 
-# =========================================================
-#  1. Master DNA Data (全データ保持)
-# =========================================================
+# --- 1. Master DNA Data ---
 DNA_MASTER = {
     "J-POP (Mainstream)": {"bpm": 148, "key": 1, "key_name": "C#", "energy": 0.78,
                            "logic": "現代の王道ヒット。BPM140超の疾走感。",
@@ -43,74 +41,79 @@ KEY_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]
 LYRIC_FLAVORS = {"王道チャート": "Standard", "詩的・比喩的": "Metaphorical", "映画的描写": "Cinematic",
                  "ストレート/感情剥き出し": "Raw", "哲学的・ダーク": "Deep"}
 
-# =========================================================
-#  2. UI Style (ポップアップ内・黒背景・白文字・スクロール)
-# =========================================================
+# --- 2. CSS Style (ポップアップ内を漆黒・純白に固定) ---
 st.markdown(
     """
     <style>
       [data-testid="stAppViewContainer"], [data-testid="stHeader"], .main { background-color: #0a0b0e !important; color: #ffffff !important; }
       [data-testid="stSidebar"], [data-testid="stSidebar"] * { background-color: #101217 !important; color: #ffffff !important; }
-
       div[data-testid="stPopoverBody"] {
-        background-color: #000000 !important;
-        border: 2px solid #e3b341 !important;
-        max-height: 80vh !important;
-        overflow-y: auto !important;
-        padding: 20px !important;
+        background-color: #000000 !important; border: 2px solid #e3b341 !important;
+        max-height: 80vh !important; overflow-y: auto !important; padding: 20px !important;
       }
       div[data-testid="stPopoverBody"] * { color: #ffffff !important; }
-
       .card { background-color: #111418 !important; border: 1px solid #1d212a !important; border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem; }
       .stButton > button { background: linear-gradient(135deg, #1b1e25 0%, #e3b341 100%) !important; color:#000 !important; font-weight: 900; border-radius: 12px; height: 3.2rem; border:none; width:100%; }
-      h1, h2, h3, label { color: #ffffff !important; }
+      h1, h2, h3, label, p { color: #ffffff !important; }
     </style>
     """, unsafe_allow_html=True
 )
 
-# =========================================================
-#  3. Sidebar (全ポップアップ統一)
-# =========================================================
+# --- 3. Sidebar (全ポップアップ統一) ---
 with st.sidebar:
     st.markdown('<h1 style="color:#e3b341; font-size:1.6rem; margin-bottom:20px;">🎼 HitForge Menu</h1>',
                 unsafe_allow_html=True)
 
-    # A: アーティスト
+    # A: アーティスト・視点
     with st.popover("👤 アーティスト・視点", use_container_width=True):
         v_gender = st.radio("性別", ["Male", "Female", "Non-binary"], index=1)
         l_pov = st.radio("歌詞の視点", ["Male POV", "Female POV", "Neutral POV"], index=2)
 
-    # B: キーワード
+    # B: 制作キーワード
     with st.popover("📝 制作キーワード", use_container_width=True):
         must_have = st.text_input("必須キーワード", placeholder="例: 青い閃光")
         negative_p = st.text_input("NGワード", placeholder="例: 桜")
 
-    # C: 文字数制限 (★スライダーを削除し、入力BOXのみに)
+    # C: 文字数制限 (入力BOXのみ)
     with st.popover("📏 文字数制限", use_container_width=True):
-        p_limit = st.number_input("プロンプト最大文字数", min_value=80, max_value=2500, value=1500, step=10)
-        st.caption("※入力した数値がプロンプト生成時に反映されます。")
+        p_limit = st.number_input("最大文字数", 80, 2500, value=1500, step=10)
 
-    # D: ジャンル・BPM・キー設定
-    with st.popover("🎹 楽曲構成設定 (BPM/Key)", use_container_width=True):
-        genre_key = st.radio("ベースDNAを選択", list(DNA_MASTER.keys()), index=0)
-        base_dna = DNA_MASTER[genre_key]
+    # D: 楽曲構成設定 (ジャンル連動リセット機能付き)
+    if "current_bpm" not in st.session_state:
+        st.session_state.current_bpm = 148
+        st.session_state.current_key = "C#"
+        st.session_state.sel_genre = "J-POP (Mainstream)"
+
+    with st.popover("🎹 楽曲構成 (Genre/BPM/Key)", use_container_width=True):
+        def on_genre_change():
+            new_dna = DNA_MASTER[st.session_state.genre_radio]
+            st.session_state.current_bpm = int(new_dna["bpm"])
+            st.session_state.current_key = new_dna["key_name"]
+
+
+        genre_key = st.radio("1. ジャンル選択", list(DNA_MASTER.keys()), key="genre_radio", on_change=on_genre_change)
+
         st.write("---")
-        st.markdown("### 🎛️ 手動微調整")
-        user_bpm = st.slider("BPM (テンポ)", 60, 220, int(base_dna["bpm"]))
-        user_key = st.selectbox("Key (調)", KEY_NAMES, index=base_dna["key"])
-        dna = base_dna.copy()
+        st.markdown("### 2. 手動微調整")
+        user_bpm = st.slider("BPM (テンポ)", 60, 220, key="current_bpm")
+        user_key = st.selectbox("Key (調)", KEY_NAMES, index=KEY_NAMES.index(st.session_state.current_key),
+                                key="current_key_sel")
+        # セレクトボックスの値をsession_stateに同期
+        st.session_state.current_key = user_key
+
+        dna = DNA_MASTER[genre_key].copy()
         dna["bpm"] = user_bpm
         dna["key_name"] = user_key
 
-    # E: DNA分析
+    # E: DNA分析結果
     with st.popover("📊 現在のDNA分析結果", use_container_width=True):
-        st.write(f"### DNA Logic: {genre_key}")
+        st.write(f"### Logic: {genre_key}")
+        st.write(f"> {dna['logic']}")
         bpm_bins = np.linspace(60, 200, 15)
         bpm_dist = np.exp(-0.5 * ((bpm_bins - dna['bpm']) / 15) ** 2)
         st.bar_chart(pd.DataFrame({'Freq': bpm_dist}, index=bpm_bins.astype(int)), height=150)
-        current_key_idx = KEY_NAMES.index(user_key)
         key_dist = [0.1] * 12;
-        key_dist[current_key_idx] = 0.9
+        key_dist[KEY_NAMES.index(dna['key_name'])] = 0.9
         st.bar_chart(pd.DataFrame({'Pop': key_dist}, index=KEY_NAMES), height=150)
 
     # F: 言語・表現
@@ -123,11 +126,8 @@ with st.sidebar:
     boost_mode = st.toggle("Anthemic Boost", value=True)
     optimizer = st.toggle("Top-Chart Optimizer", value=True)
 
-# =========================================================
-#  4. Main Display
-# =========================================================
-st.markdown('<h1 style="color:#e3b341; text-align:center; font-size:2.5rem;">🎼 HitForge Production</h1>',
-            unsafe_allow_html=True)
+# --- 4. Main Content ---
+st.markdown('<h1 style="color:#e3b341; text-align:center;">🎼 HitForge Production</h1>', unsafe_allow_html=True)
 st.markdown(
     '<div style="height:4px; width:180px; background:#e3b341; margin: 0 auto 30px auto; border-radius:6px;"></div>',
     unsafe_allow_html=True)
@@ -141,7 +141,6 @@ if st.button("⚡ GENERATE HIT-DNA PROMPT"):
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("🎨 Style Prompt")
     st.text_area("S", style_raw[:p_limit], height=140, label_visibility="collapsed")
-    st.write("---")
     st.subheader("✍️ Lyrics Prompt")
     st.text_area("L", lyrics_raw[:p_limit], height=200, label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
