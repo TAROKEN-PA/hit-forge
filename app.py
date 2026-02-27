@@ -1,42 +1,60 @@
 import streamlit as st
 import plotly.graph_objects as go
+import pandas as pd
 
-# 1. グラフを作る「道具（関数）」の定義
-def display_futuristic_metrics(bpm_value):
-    fig = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = bpm_value,
-        title = {'text': "TARGET BPM", 'font': {'color': "#c9a050", 'size': 20}},
-        number = {'font': {'color': "#ffffff", 'size': 50}},
-        gauge = {
-            'axis': {'range': [60, 200], 'tickwidth': 1, 'tickcolor': "#c9a050"},
-            'bar': {'color': "#c9a050"},
-            'bgcolor': "rgba(0,0,0,0)",
-            'borderwidth': 2,
-            'bordercolor': "#333",
-            'steps': [
-                {'range': [60, 100], 'color': 'rgba(201, 160, 80, 0.1)'},
-                {'range': [100, 160], 'color': 'rgba(201, 160, 80, 0.2)'},
-                {'range': [160, 200], 'color': 'rgba(201, 160, 80, 0.3)'}
-            ]
-        }
+# --- 1. プリセットデータの準備 (たろけんぱさんのデータに合わせて書き換えてお) ---
+data = {
+    'Genre': ['J-POP', 'City Pop', 'HipHop', 'Rock', 'Lofi'],
+    'BPM': [158, 115, 95, 135, 80],
+    'Energy': [0.85, 0.65, 0.75, 0.90, 0.30],
+    'Danceability': [0.60, 0.80, 0.90, 0.50, 0.40],
+    'Key_Match': [95, 80, 70, 85, 60] # ヒット曲とのKey一致率(想定)
+}
+df = pd.DataFrame(data)
+
+st.title("🎧 HitForge | Global DNA Analysis")
+
+# --- 2. メイン：レーダーチャート（全要素を一度に比較） ---
+# これが一番「分析してる感」が出るお！
+fig_radar = go.Figure()
+
+for i, row in df.iterrows():
+    fig_radar.add_trace(go.Scatterpolar(
+        r=[row['Energy'], row['Danceability'], row['Key_Match']/100, row['BPM']/200, row['Energy']],
+        theta=['Energy','Danceability','Key Accuracy','Tempo Scale','Energy'],
+        fill='toself',
+        name=row['Genre']
     ))
 
-    fig.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font={'color': "#ffffff"},
-        height=400
-    )
-    return fig
+fig_radar.update_layout(
+    polar=dict(
+        radialaxis=dict(visible=True, range=[0, 1], gridcolor="rgba(201,160,80,0.2)"),
+        bgcolor="rgba(0,0,0,0)"
+    ),
+    paper_bgcolor='rgba(0,0,0,0)',
+    font=dict(color="#ffffff"),
+    title="Multi-Genre DNA Structure",
+    showlegend=True
+)
 
-# 2. 実際に画面に表示する命令（ここが抜けてたお！）
-st.title("HitForge Data Analysis")
+st.plotly_chart(fig_radar, use_container_width=True)
 
-# 本来はプリセットデータのBPMを入れるけど、まずはテストで「148」を表示！
-current_bpm = 148
+# --- 3. サブ：BPM比較バーチャート（黄金のグラデーション） ---
+st.markdown("### 📊 BPM Distribution by Genre")
+fig_bar = go.Figure(go.Bar(
+    x=df['Genre'],
+    y=df['BPM'],
+    marker=dict(color=df['BPM'], colorscale=[[0, '#050609'], [1, '#c9a050']]),
+    text=df['BPM'],
+    textposition='auto',
+))
 
-# グラフを表示しろ！という命令
-st.plotly_chart(display_futuristic_metrics(current_bpm), use_container_width=True)
+fig_bar.update_layout(
+    paper_bgcolor='rgba(0,0,0,0)',
+    plot_bgcolor='rgba(0,0,0,0)',
+    font=dict(color="#ffffff"),
+    xaxis=dict(gridcolor="rgba(255,255,255,0.1)"),
+    yaxis=dict(gridcolor="rgba(255,255,255,0.1)")
+)
 
-st.write("Spotify DNA Analysis: Complete.")
+st.plotly_chart(fig_bar, use_container_width=True)
